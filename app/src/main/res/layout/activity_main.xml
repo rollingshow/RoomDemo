@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".MainActivity">
-<Button
-    android:onClick="onAddTuneClick"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Add tune" />
-
-<Button
-    android:onClick="onClearClick"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Clear" />
 
 
-<ListView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/listview" />
+    <ListView
+        android:id="@+id/imagesListView"
+        style="@style/Widget.AppCompat.Light.ListView.DropDown"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="12dp"
+        android:layout_weight="4">
+
+    </ListView>
 
 </LinearLayout>
