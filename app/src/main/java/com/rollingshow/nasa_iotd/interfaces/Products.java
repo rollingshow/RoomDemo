@@ -10,7 +10,7 @@ import com.rollingshow.nasa_iotd.Picture;
 @Dao
 public
 interface Products {
-    @Query("SELECT * FROM pictures ORDER BY date")
+    @Query("SELECT * FROM pictures ORDER BY date DESC")
     Picture[] selectAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -12,6 +12,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.rollingshow.nasa_iotd.databases.PicturesDB;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -65,16 +70,28 @@ public class MainActivity extends AppCompatActivity {
         // создаём обработчик, определённый интерфейсом PixabayAPI выше
         NasaAPI api = retrofit.create(NasaAPI.class);
 
+
+        // Рассчитываем даты для запроса
+        TimeZone ESTTimeZone = TimeZone.getTimeZone("EST");
+        Calendar callCalendar = Calendar.getInstance(ESTTimeZone);
+        SimpleDateFormat callDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        callDateFormat.setTimeZone(ESTTimeZone);
+
+        String end_date = callDateFormat.format(callCalendar.getTime());
+
+        callCalendar.add(Calendar.DAY_OF_MONTH, -7);
+        String start_date = callDateFormat.format(callCalendar.getTime());
+
         // указываем, какую функцию API будем использовать
-        Call<Hit> call = api.update(key);  // создали запрос
+        Call<Hit[]> call = api.update(key, start_date, end_date);  // создали запрос
 
         // Обработка ответа
-        Callback<Hit> callback = new Callback<Hit>() {
+        Callback<Hit[]> callback = new Callback<Hit[]>() {
             // При успехе
             @Override
-            public void onResponse(@NonNull Call<Hit> call, retrofit2.Response<Hit> response) {
+            public void onResponse(@NonNull Call<Hit[]> call, retrofit2.Response<Hit[]> response) {
                 // Получили ответ в виде объекта
-                Hit r = response.body();
+                Hit[] r = response.body();
                 if (r != null) {
                     // Отобразили ответ
                     displayResults(r);
@@ -98,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
             // При ошибке загрузки
             @Override
-            public void onFailure(@NonNull Call<Hit> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<Hit[]> call, @NonNull Throwable t) {
                 Toast toast = Toast.makeText(getApplicationContext(), "Connection error!", Toast.LENGTH_LONG);
                 toast.show();
 
@@ -109,15 +126,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Вывод ответа
-    public void displayResults(Hit hit) {
+    public void displayResults(Hit[] hits) {
         // вызывается, когда появятся результаты поиска
-        Picture p_tst = new Picture(
-                hit.date,
-                hit.hdurl,
-                hit.explanation,
-                hit.title
-        );
-        DB.products().insertNew(p_tst);
+        for (Hit hit: hits) {
+            Log.d("mytag_check", hit.url);
+            Picture p_tst = new Picture(
+                    hit.date,
+                    hit.url,
+                    hit.explanation,
+                    hit.title
+            );
+            DB.products().insertNew(p_tst);
+        }
+
 
         displayPictures(null);
     }
@@ -125,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
     // Интерфейс для API
     interface NasaAPI {
         @GET(page)
-        Call<Hit> update(@Query("api_key") String key);
+        Call<Hit[]> update(@Query("api_key") String key, @Query("start_date") String start_date, @Query("end_date") String end_date);
         // Тип ответа, действие, содержание запроса
     }
 }
