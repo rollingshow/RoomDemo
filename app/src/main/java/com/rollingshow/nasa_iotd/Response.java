@@ -10,6 +10,7 @@ public class Response {
     @Override
     public String toString() {
 
-        return "totalHits = " + totalHits;
+            return "totalHits = " + totalHits;
+
     }
 }
